@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ua">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кулінарний Асистент</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="controls-wrapper">
+            <div class="custom-lang-selector" id="langSelector">
+                <button class="lang-selector-btn" id="langBtn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="globe-icon-svg">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span id="currentLangText">UA</span>
+                    <span class="arrow-down">▼</span>
+                </button>
+                
+                <div class="lang-dropdown-menu" id="langMenu">
+                    <div class="lang-option" data-lang="ua">Українська</div>
+                    <div class="lang-option" data-lang="en">English</div>
+                </div>
+            </div>
+
+            <div class="custom-lang-selector" id="profileSelector">
+                <button class="lang-selector-btn" id="profileBtn" title="Профіль">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+                        <path d="M6 20.2a6.5 6.5 0 0 1 12 0"></path>
+                    </svg>
+                    <span class="arrow-down">▼</span>
+                </button>
+                
+                <div class="lang-dropdown-menu profile-menu" id="profileMenu">
+                    <div class="profile-header">
+                        <strong id="profileName">Гість</strong>
+                        <span id="profileRole" style="font-size: 0.8em; color: gray;">Не авторизовано</span>
+                    </div>
+                    <hr style="margin: 5px 0; border: 0; border-top: 1px solid var(--border-color);">
+                    <div class="lang-option" id="menuSettings">⚙️ Налаштування</div>
+                    <div class="lang-option" id="menuStats">📊 Моя статистика</div>
+                    <div class="lang-option" id="menuLogin" style="color: var(--primary-color);">🔑 Увійти / Реєстрація</div>
+                    <div class="lang-option" id="menuLogout" style="color: red; display: none;">🚪 Вийти</div>
+                </div>
+            </div>
+
+            <div class="theme-switch-container">
+                <input type="checkbox" id="themeToggleCheckbox" class="theme-checkbox">
+                <label for="themeToggleCheckbox" class="theme-label">
+                    <span class="theme-inner"></span>
+                    <span class="theme-switch"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <h1 id="mainTitle">Мій Кулінарний Асистент</h1>
+    <button id="testBtn">Перевірити зв'язок з бэкендом</button>
+    <p id="responseArea"></p>
+
+    <hr>
+    
+    <h2 id="aiTitle">ШІ-Кухар</h2>
+    <div class="ai-form">
+        <input type="text" id="aiPrompt" placeholder="Наприклад: Напиши рецепт плова з куркою" style="width: 300px; padding: 10px;">
+        <button id="generateBtn">Сгенерирувати та зберегти</button>
+    </div>
+    <p id="aiStatus"></p>
+
+    <hr>
+    
+    <h2 id="manualTitle">Додати рецепт вручну</h2>
+    <div class="recipe-form-manual">
+        <input type="text" id="manualName" placeholder="Назва страви" required>
+        <select id="manualCategory">
+            <option value="first_dishes">🥣 Перші страви</option>
+            <option value="second_dishes">🍝 Другі страви</option>
+            <option value="sweets">🍰 Десерти</option>
+            <option value="drinks">🍹 Напої</option>
+        </select>
+        <input type="text" id="manualTime" placeholder="Час приготування (наприклад: 40 хв)" required>
+        <textarea id="manualIngredients" placeholder="Інгредієнти (кожен з нового рядка)" rows="4" required></textarea>
+        <input type="number" id="manualQuantity" placeholder="Кількість інгредієнтів" min="1" required>
+        <button id="saveManualBtn">Зберегти рецепт</button>
+    </div>
+    <p id="manualStatus"></p>
+
+    <hr>
+
+    <h2 id="plannerTitle">Календар планування</h2>
+    <div class="planner-container">
+
+        <div class="planner-form">
+            <input type="date" id="planDate" required>
+            
+            <select id="planMealType">
+                <option value="breakfast">Сніданок</option>
+                <option value="lunch">Обід</option>
+                <option value="dinner">Вечеря</option>
+            </select>
+            
+            <select id="planRecipe">
+                <option value="">Завантаження рецептів...</option>
+            </select>
+            
+            <label for="planTime" style="font-size: 0.9rem; opacity: 0.8;" id="labelNotificationTime">Час нагадування:</label>
+            <input type="time" id="planTime">
+            
+            <button id="addPlanBtn">Запланувати</button>
+        </div>
+        
+        <div class="planner-schedule">
+            <h3 id="scheduleSubtitle">Розклад на обраний день:</h3>
+            <div id="scheduleContainer">
+                <p id="scheduleEmptyText">Оберіть дату, щоб побачити розклад.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    
+    <h2 id="savedRecipesTitle">Мої збережені рецепти</h2>
+    
+    <div class="recipes-control-panel">
+        <button id="loadRecipesBtn">Завантажити рецепти з бази</button>
+        
+        <select id="categoryFilter" class="filter-dropdown">
+            <option value="all">Усі категорії</option>
+            <option value="first_dishes">🥣 Перші страви</option>
+            <option value="second_dishes">🍝 Другі страви</option>
+            <option value="sweets">🍰 Десерти</option>
+            <option value="drinks">🍹 Напої</option>
+        </select>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Пошук за назвою або інгредієнтом...">
+        <button id="searchBtn">Шукати</button>
+        <button id="resetSearchBtn" style="display: none; background-color: #6c757d;">Скинути</button>
+    </div>
+
+    <div id="recipesContainer" class="recipes-grid"></div>
+
+    <div id="authModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 style="margin-top: 0;">Вхід у систему</h2>
+            <form id="authForm" onsubmit="event.preventDefault();">
+                <input type="email" id="authEmail" name="email" autocomplete="username" placeholder="Введіть Email" required>
+                <input type="password" id="authPassword" name="password" autocomplete="current-password" placeholder="Введіть Пароль" required minlength="6">
+                <p id="authError" style="color: red; font-size: 0.9em; margin: 5px 0;"></p>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="loginSubmitBtn" style="flex: 1;">Увійти</button>
+                    <button type="button" id="registerSubmitBtn" style="flex: 1; background-color: #28a745;">Зареєструватися</button>
+                </div>
+                <button type="button" id="googleAuthBtn" style="background-color: #4285F4; margin-top: 10px; width: 100%;">🌐 Увійти через Google</button>
+                <button type="button" id="closeAuthBtn" style="background-color: #6c757d; margin-top: 10px; width: 100%;">Скасувати</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="width: 350px;">
+            <h2 style="margin-top: 0;">⚙️ Налаштування профілю</h2>
+            
+            <form id="settingsForm" onsubmit="event.preventDefault();">
+                <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+                    <label style="font-size: 0.9em; color: gray; margin-bottom: 3px;">Нікнейм:</label>
+                    <input type="text" id="settingsNickname" placeholder="Твій нікнейм" required style="padding: 8px;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+                    <label style="font-size: 0.9em; color: gray; margin-bottom: 3px;">Email:</label>
+                    <input type="email" id="settingsEmail" placeholder="Твій Email" required style="padding: 8px;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                    <label style="font-size: 0.9em; color: gray; margin-bottom: 3px;">Новий пароль:</label>
+                    <input type="password" id="settingsPassword" placeholder="Введіть новий пароль" minlength="6" style="padding: 8px;">
+                </div>
+                
+                <div style="background: var(--bg-color); padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); margin-bottom: 15px; text-align: center;">
+                    <strong>🛡️ Двофакторна автентифікація (2FA)</strong>
+                    <p style="font-size: 0.8em; margin: 5px 0 10px 0;">Захисти свій акаунт за допомогою Google Authenticator.</p>
+                    <button type="button" id="enable2FABtn" style="background-color: #ff9800; width: 100%; padding: 8px; cursor: pointer; border: none; border-radius: 5px; color: white;">Налаштувати 2FA</button>
+                </div>
+
+                <p id="settingsError" style="font-size: 0.9em; margin: 5px 0;"></p>
+                
+                <button type="button" id="saveSettingsBtn" style="background-color: #28a745; width: 100%; padding: 10px; border: none; border-radius: 5px; color: white; cursor: pointer;">Зберегти зміни</button>
+                <button type="button" id="closeSettingsBtn" style="background-color: #6c757d; margin-top: 10px; width: 100%; padding: 10px; border: none; border-radius: 5px; color: white; cursor: pointer;">Закрити</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="2faModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="width: 350px;">
+            <h2>🛡️ 2FA Налаштування</h2>
+            <img id="qrImg" src="" alt="QR Code" style="width: 200px; margin: 10px auto; display: block;">
+            <p>Скануйте код в Google Authenticator:</p>
+            <input type="text" id="verifyCode" placeholder="000000" maxlength="6" style="width: 150px; text-align: center; font-size: 1.6em; letter-spacing: 6px; margin: 15px auto; display: block; border: 2px solid var(--border-color); border-radius: 6px; padding: 8px; background: var(--bg-color); color: var(--text-color);">
+            <button id="submitVerify" style="background-color: #28a745; width: 100%; padding: 12px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 5px; color: white; cursor: pointer;">Підтвердити</button>
+            <button id="close2FABtn" style="background-color: #6c757d; margin-top: 10px; width: 100%;">Закрити</button>
+            <p id="msg"></p>
+        </div>
+    </div>
+
+    <div id="login2faModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="width: 320px; text-align: center;">
+            <h2 style="margin-top: 0;">Введіть код 2FA</h2>
+            <p style="font-size: 0.9em; color: gray;">Цей акаунт захищено Google Authenticator.</p>
+            
+            <input type="text" id="login2faCode" placeholder="000000" maxlength="6" style="width: 150px; text-align: center; font-size: 1.6em; letter-spacing: 6px; margin: 15px auto; display: block; border: 2px solid var(--border-color); border-radius: 6px; padding: 8px; background: var(--bg-color); color: var(--text-color);">
+            <p id="login2faError" style="color: red; font-size: 0.9em; margin-bottom: 10px;"></p>
+            
+            <button id="login2faSubmitBtn" style="background-color: #28a745; width: 100%; padding: 12px; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Підтвердити</button>
+            <button id="login2faCancelBtn" style="background-color: #6c757d; margin-top: 10px; width: 100%; padding: 12px; color: white; border: none; border-radius: 5px; cursor: pointer;">Скасувати</button>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/timeManager.js"></script> 
+    <script src="js/app.js"></script>
+</body>
+</html>
