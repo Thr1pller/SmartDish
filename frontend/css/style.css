@@ -1,13 +1,13 @@
 /* Визначаємо палітру кольорів через змінні */
 :root {
-    --bg-color: #f4f4f9;
-    --text-color: #333333;
-    --card-bg: #ffffff;
-    --border-color: #dddddd;
-    --primary-color: #0056b3;
-    --primary-hover: #004494;
-    --badge-bg: #17a2b8;
-    --hr-color: #cccccc;
+    --bg-color: #f1f5f9;
+    --text-color: #334155;
+    --card-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;  
+    --badge-bg: #10b981;
+    --hr-color: #e2e8f0;
 }
 
 /* Кольори для темної теми */

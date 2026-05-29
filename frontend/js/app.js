@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Допоміжна функція: Отримуємо токен, або показуємо помилку
+    function getTokenOrShowError(showError = true) {
+        const token = localStorage.getItem('access_token');
+        if (!token && showError) {
+            showToast("Увійдіть в акаунт для цієї дії!", "warning");
+        }
+        return token;
+    }
+
     // --- Глобальна функція для Toast-сповіщень ---
     function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
@@ -45,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Словник ---
     const translations = {
         ua: {
-            mainTitle: "Мій Кулінарний Асистент",
+            mainTitle: "SmartDish",
             testBtn: "Перевірити зв'язок з бекендом",
             aiTitle: "ШІ-Кухар",
             aiPlaceholder: "Наприклад: Напиши рецепт плова з куркою",
@@ -85,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         en: {
-            mainTitle: "My Culinary Assistant",
+            mainTitle: "SmartDish",
             testBtn: "Check Connection with Backend",
             aiTitle: "AI Chef",
             aiPlaceholder: "E.g.: Write a recipe for chicken pilaf",
@@ -132,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const uiElements = {
         mainTitle: document.getElementById('mainTitle'),
-        testBtn: document.getElementById('testBtn'),
+        mainTitleWave: document.getElementById('mainTitleWave'),
         aiTitle: document.getElementById('aiTitle'),
         aiPrompt: document.getElementById('aiPrompt'),
         generateBtn: document.getElementById('generateBtn'),
@@ -154,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyLanguage(lang) {
         currentLang = lang;
         uiElements.mainTitle.textContent = translations[lang].mainTitle;
-        uiElements.testBtn.textContent = translations[lang].testBtn;
+        if (uiElements.mainTitleWave) uiElements.mainTitleWave.textContent = translations[lang].mainTitle;
         uiElements.aiTitle.textContent = translations[lang].aiTitle;
         uiElements.aiPrompt.placeholder = translations[lang].aiPlaceholder;
         uiElements.generateBtn.textContent = translations[lang].generateBtn;
@@ -260,20 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else document.body.classList.remove('dark-theme');
     });
 
-    // --- Перевірка зв'язку ---
-    document.getElementById('testBtn').addEventListener('click', async () => {
-        const resArea = document.getElementById('responseArea');
-        try {
-            const res = await fetch('http://127.0.0.1:8000/api/ping');
-            const data = await res.json();
-            resArea.textContent = data.message;
-            resArea.style.color = "green";
-        } catch {
-            resArea.textContent = "Помилка з'єднання!";
-            resArea.style.color = "red";
-        }
-    });
-
     // --- Логіка Планувальника ---
     const planDate = document.getElementById('planDate');
     const planMealType = document.getElementById('planMealType');
@@ -286,9 +281,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = TimeManager.getLocalDateString();
     planDate.value = today;
 
-    async function loadRecipesForPlanner() {
+async function loadRecipesForPlanner() {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            planRecipe.innerHTML = `<option value="">Увійдіть в акаунт</option>`;
+            return;
+        }
+
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/recipes');
+            const res = await fetch('http://127.0.0.1:8000/api/recipes', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const recipes = await res.json();
             planRecipe.innerHTML = '';
             
@@ -311,8 +314,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadSchedule(dateStr) {
         if (!dateStr) return;
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            scheduleContainer.innerHTML = `<p>Увійдіть, щоб бачити розклад.</p>`;
+            return;
+        }
+
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/schedule/${dateStr}`);
+            const res = await fetch(`http://127.0.0.1:8000/api/schedule/${dateStr}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const schedules = await res.json();
             scheduleContainer.innerHTML = '';
             
@@ -346,7 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', async (e) => {
                     const scheduleId = e.target.getAttribute('data-id');
                     if (confirm("Видалити цю страву з розкладу?")) {
-                        await fetch(`http://127.0.0.1:8000/api/schedule/${scheduleId}`, { method: 'DELETE' });
+                        await fetch(`http://127.0.0.1:8000/api/schedule/${scheduleId}`, { 
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
                         loadSchedule(dateStr);
                         if (dateStr === today) loadTodaySchedulesForNotifications();
                     }
@@ -357,22 +371,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Окрема швидка функція для фонового завантаження сьогоднішнього розкладу
+// Окрема швидка функція для фонового завантаження сьогоднішнього розкладу
     async function loadTodaySchedulesForNotifications() {
+        const token = localStorage.getItem('access_token');
+        if (!token) return; // Якщо гість - ніяких пушів
+
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/schedule/${today}`);
+            const res = await fetch(`http://127.0.0.1:8000/api/schedule/${today}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             todaySchedules = await res.json();
         } catch (e) { console.error(e); }
     }
 
     planDate.addEventListener('change', (e) => loadSchedule(e.target.value));
 
-    addPlanBtn.addEventListener('click', async () => {
+addPlanBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            showToast("Увійдіть в акаунт!", "warning");
+            return;
+        }
+
         const date = planDate.value;
         const meal_type = planMealType.value;
         const recipe_id = planRecipe.value;
         
-        // Збираємо дату та час докупи і конвертуємо в UTC через наш сервіс:
         const scheduled_at = TimeManager.convertToUTCISO(date, planTime.value);
 
         if (!date || !recipe_id) {
@@ -384,7 +408,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await fetch('http://127.0.0.1:8000/api/schedule', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify({ meal_type, recipe_id: parseInt(recipe_id), scheduled_at })
             });
             planTime.value = ''; 
@@ -482,12 +509,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.category-select-inline').forEach(selectEl => {
             selectEl.addEventListener('change', async (e) => {
+                // ДОДАЛИ ПЕРЕВІРКУ ТОКЕНА
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    showToast("Увійдіть в акаунт!", "warning");
+                    return;
+                }
+
                 const recipeId = e.target.getAttribute('data-id');
                 const newCategory = e.target.value;
 
                 try {
+                    // ДОДАЛИ HEADERS
                     const response = await fetch(`http://127.0.0.1:8000/api/recipes/${recipeId}/category?category=${newCategory}`, {
-                        method: 'PATCH'
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
 
                     if (!response.ok) throw new Error("Помилка при оновленні");
@@ -507,9 +543,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.delete-recipe-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    showToast("Увійдіть в акаунт!", "warning");
+                    return;
+                }
+                
                 const recipeId = e.currentTarget.getAttribute('data-id'); 
                 if (confirm("Точно видалити цей рецепт? Він також зникне з розкладу!")) {
-                    await fetch(`http://127.0.0.1:8000/api/recipes/${recipeId}`, { method: 'DELETE' });
+                    await fetch(`http://127.0.0.1:8000/api/recipes/${recipeId}`, { 
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
                     
                     globalRecipesCache = globalRecipesCache.filter(r => r.id !== parseInt(recipeId));
                     filterAndRenderRecipes();
@@ -533,9 +578,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     categoryFilter.addEventListener('change', filterAndRenderRecipes);
 
+// --- ЗАВАНТАЖЕННЯ РЕЦЕПТІВ ---
     loadRecipesBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            recipesContainer.innerHTML = `<p style="color: red;">Увійдіть в акаунт!</p>`;
+            return;
+        }
+        
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/recipes');
+            // Виправлено синтаксичну помилку (дужка тепер в самому кінці)
+            const response = await fetch('http://127.0.0.1:8000/api/recipes', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!response.ok) throw new Error("Network response was not ok");
+            
             globalRecipesCache = await response.json();
             categoryFilter.value = 'all'; 
             renderRecipeCards(globalRecipesCache);
@@ -547,11 +605,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- ПОШУК РЕЦЕПТІВ ---
     searchBtn.addEventListener('click', async () => {
         const keyword = searchInput.value.trim();
         if (!keyword) return;
+        
+        // ДОДАЛИ перевірку токена для пошуку!
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            showToast("Увійдіть в акаунт для пошуку!", "warning");
+            return;
+        }
+
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/recipes/search?keyword=${encodeURIComponent(keyword)}`);
+            // ДОДАЛИ headers з токеном у fetch
+            const response = await fetch(`http://127.0.0.1:8000/api/recipes/search?keyword=${encodeURIComponent(keyword)}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!response.ok) throw new Error("Search failed");
+            
             globalRecipesCache = await response.json(); 
             categoryFilter.value = 'all';
             renderRecipeCards(globalRecipesCache);
@@ -563,11 +636,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resetSearchBtn.addEventListener('click', () => loadRecipesBtn.click());
 
-    // --- Логіка додавання рецепта ВРУЧНУ ---
+// --- Логіка додавання рецепта ВРУЧНУ ---
     const saveManualBtn = document.getElementById('saveManualBtn');
     const manualStatus = document.getElementById('manualStatus');
 
     saveManualBtn.addEventListener('click', async () => {
+        // 1. ПЕРЕВІРКА ТОКЕНА
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            showToast("Увійдіть в акаунт для збереження!", "warning");
+            return;
+        }
+
         const name = document.getElementById('manualName').value.trim();
         const category = document.getElementById('manualCategory').value;
         const time_cooking = document.getElementById('manualTime').value.trim();
@@ -581,9 +661,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            // 2. ДОДАНО HEADERS
             const response = await fetch('http://127.0.0.1:8000/api/recipes', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ name, category, time_cooking, ingredients, quantity: parseInt(quantity) })
             });
 
@@ -597,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('manualIngredients').value = '';
             document.getElementById('manualQuantity').value = '';
 
-            loadRecipesBtn.click();
+            if(loadRecipesBtn) loadRecipesBtn.click();
         } catch (e) {
             manualStatus.textContent = translations[currentLang].aiError;
             manualStatus.style.color = "red";
@@ -609,7 +693,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiPrompt = document.getElementById('aiPrompt');
     const aiStatus = document.getElementById('aiStatus');
 
+// --- Логіка генерації через ШІ ---
     generateBtn.addEventListener('click', async () => {
+        // 1. ПЕРЕВІРКА ТОКЕНА
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            showToast("Увійдіть в акаунт для генерації!", "warning");
+            return;
+        }
+
         const promptText = aiPrompt.value.trim();
         if (!promptText) {
             aiStatus.textContent = translations[currentLang].aiEmptyPrompt;
@@ -624,7 +716,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('http://127.0.0.1:8000/api/ai/generate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify({ prompt: promptText })
             });
 
@@ -637,7 +732,8 @@ document.addEventListener('DOMContentLoaded', () => {
             aiStatus.style.color = "green";
             aiPrompt.value = '';
             
-            loadRecipesBtn.click();
+            // Якщо є кнопка завантаження - оновлюємо список
+            if(loadRecipesBtn) loadRecipesBtn.click();
         } catch (error) {
             aiStatus.textContent = translations[currentLang].aiError;
             aiStatus.style.color = "red";
@@ -694,7 +790,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     profileRole.textContent = "Користувач";
                     if (menuLogout) menuLogout.style.display = 'block';
                     if (menuLogin) menuLogin.style.display = 'none';
+                    if (document.getElementById('navRecipesWave')) document.getElementById('navRecipesWave').style.backgroundColor = '#4CAF50';
                     return;
+                    
                 } else {
                     localStorage.removeItem('access_token');
                     localStorage.removeItem('user_email');
@@ -706,6 +804,12 @@ document.addEventListener('DOMContentLoaded', () => {
         profileRole.textContent = "Не авторизовано";
         if (menuLogout) menuLogout.style.display = 'none';
         if (menuLogin) menuLogin.style.display = 'block';
+
+        profileName.textContent = "Гість";
+        profileRole.textContent = "Не авторизовано";
+        if (menuLogout) menuLogout.style.display = 'none';
+        if (menuLogin) menuLogin.style.display = 'block';
+        if (document.getElementById('navRecipesWave')) document.getElementById('navRecipesWave').style.backgroundColor = '#F44336';
     }
 
     // 2. Відкриття / Закриття модалки
@@ -1024,4 +1128,103 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) { console.error(e); }
     });
+
+    // --- ЛОГІКА ПЕРЕМИКАННЯ ЕКРАНІВ (SPA) ---
+    const navRecipesBtn = document.getElementById('navRecipesBtn');
+    const backToHomeBtn = document.getElementById('backToHomeBtn');
+    const homeView = document.getElementById('homeView');
+    const recipesView = document.getElementById('recipesView');
+
+    if (navRecipesBtn && backToHomeBtn && homeView && recipesView) {
+        // Клік по кнопці "Мої рецепти"
+        navRecipesBtn.addEventListener('click', () => {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                showToast("Спочатку увійдіть в акаунт!", "warning");
+                return;
+            }
+            
+            homeView.style.display = 'none';
+            recipesView.style.display = 'block';
+            
+            if (loadRecipesBtn) {
+                loadRecipesBtn.click();
+            }
+        });
+
+        backToHomeBtn.addEventListener('click', () => {
+            recipesView.style.display = 'none';
+            homeView.style.display = 'block';
+        });
+    }
+    
+    const logoHomeBtn = document.getElementById('logoHomeBtn');
+
+    if (logoHomeBtn) {
+        // --- 1. МАГІЯ КОЛЬОРОВОЇ ХВИЛІ ВІД КУРСОРА ---
+        logoHomeBtn.addEventListener('mousemove', (e) => {
+            const rect = logoHomeBtn.getBoundingClientRect();
+            // Рахуємо координати курсора відносно самого тексту
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Передаємо ці координати в CSS (вони рухають центр нашого кола)
+            logoHomeBtn.style.setProperty('--x', `${x}px`);
+            logoHomeBtn.style.setProperty('--y', `${y}px`);
+        });
+
+        logoHomeBtn.addEventListener('mouseenter', () => {
+            logoHomeBtn.style.setProperty('--radius', '150%'); 
+        });
+
+        logoHomeBtn.addEventListener('mouseleave', () => {
+            logoHomeBtn.style.setProperty('--radius', '0%'); 
+        });
+
+        // --- 2. КЛІК ПО ЛОГОТИПУ (ПОВЕРНЕННЯ НА ГОЛОВНУ) ---
+        logoHomeBtn.addEventListener('click', () => {
+            if (recipesView) recipesView.style.display = 'none';
+            if (homeView) homeView.style.display = 'block';
+        });
+    }
+
+    // --- 3. КНОПКА "МОЇ РЕЦЕПТИ" ---
+    const navRecipesWave = document.getElementById('navRecipesWave');
+    const navRecipesText = document.getElementById('navRecipesText');
+    const authTooltip = document.getElementById('authTooltip'); // Додали змінну підказки
+
+    if (navRecipesBtn && navRecipesWave) {
+        navRecipesBtn.addEventListener('mousemove', (e) => {
+            const rect = navRecipesBtn.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            navRecipesWave.style.setProperty('--x', `${x}px`);
+            navRecipesWave.style.setProperty('--y', `${y}px`);
+        });
+
+        navRecipesBtn.addEventListener('mouseenter', () => {
+            navRecipesWave.style.setProperty('--radius', '150%');
+            if (navRecipesText) navRecipesText.style.color = '#fff'; 
+            
+            // ПЕРЕВІРЯЄМО ЧИ ГІСТЬ
+            const token = localStorage.getItem('access_token');
+            if (!token && authTooltip) {
+                // Показуємо червону підказку, вона плавно виїжджає
+                authTooltip.style.opacity = '1';
+                authTooltip.style.transform = 'translateX(-50%) translateY(0)';
+            }
+        });
+
+        navRecipesBtn.addEventListener('mouseleave', () => {
+            navRecipesWave.style.setProperty('--radius', '0%');
+            if (navRecipesText) navRecipesText.style.color = ''; 
+            
+            // ХОВАЄМО ПІДКАЗКУ
+            if (authTooltip) {
+                authTooltip.style.opacity = '0';
+                authTooltip.style.transform = 'translateX(-50%) translateY(-5px)';
+            }
+        });
+    }
 });

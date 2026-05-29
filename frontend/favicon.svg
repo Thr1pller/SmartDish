@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Сторінка календаря (графітовий колір) -->
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="#334155"></rect>
+    <!-- Пружинки (сині) -->
+    <line x1="16" y1="2" x2="16" y2="6" stroke="#3b82f6"></line>
+    <line x1="8" y1="2" x2="8" y2="6" stroke="#3b82f6"></line>
+    <line x1="3" y1="10" x2="21" y2="10" stroke="#334155"></line>
+    
+    <!-- Справжнє соковите яблуко 🍏 -->
+    <!-- Тіло яблука (суцільна заливка) -->
+    <path d="M12 20.5C9.5 20.5 7 18.5 7 15.5C7 13.5 8.5 12 10.5 12C11.5 12 12 12.5 12 12.5C12 12.5 12.5 12 13.5 12C15.5 12 17 13.5 17 15.5C17 18.5 14.5 20.5 12 20.5Z" fill="#10b981" stroke="#10b981" stroke-width="1"></path>
+    <!-- Хвостик -->
+    <line x1="12" y1="12" x2="12" y2="9.5" stroke="#10b981"></line>
+    <!-- Листочок -->
+    <path d="M12 11 C 12 9, 14 9, 14 9 C 14 11, 12 11, 12 11 Z" fill="#10b981" stroke="#10b981" stroke-width="1"></path>
+</svg>

@@ -8,14 +8,14 @@
 
 - **ПІБ**: Константінов Микита Сергійович
 - **Група**: ФЕП-42
-- **Керівник**: Мисюк Роман, науковий ступінь, доцент
+- **Керівник**: Мисюк Роман, PhD, доцент
 - **Дата виконання**: [27.05.2026]
 
 ---
 
 ## 📌 Загальна інформація
 
-- **Тип проєкту**: Вебзастосунок
+- **Тип проєкту**: Веб-застосунок
 - **Мова програмування**: Python (Backend), JavaScript (Frontend)
 - **Фреймворки / Бібліотеки**: FastAPI, SQLAlchemy, Alembic, Pydantic, Passlib
 - **База даних**: PostgreSQL
@@ -55,7 +55,7 @@
 ### 2. Клонування репозиторію
 
 ```bash
-git clone [https://github.com/your-username/recipe-web-app.git](https://github.com/your-username/recipe-web-app.git)
+git clone [https://github.com/Thr1pller/SmartDish.git](https://github.com/Thr1pller/SmartDish.git)
 cd recipe-web-app
 ```
 
@@ -160,7 +160,8 @@ uvicorn app.main:app --reload
 ![Екран входу](screenshots/login.jpg)
 
 **Панель згенерованих рецептів**
-![Рецепти](screenshots/recipes.png)
+![Рецепти](screenshots/recipes_1.jpg)
+![Рецепти](screenshots/recipes_2.jpg)
 
 **Інтерактивний календар планування**
 ![Календар](screenshots/calendar.png)
