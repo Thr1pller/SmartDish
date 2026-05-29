@@ -159,12 +159,18 @@ uvicorn app.main:app --reload
 **Головний екран авторизації**
 ![Екран входу](screenshots/login.jpg)
 
+**Налаштування користувача**
+![Налаштування](screenshots/settings.jpg)
+
 **Панель згенерованих рецептів**
 ![Рецепти](screenshots/recipes_1.jpg)
 ![Рецепти](screenshots/recipes_2.jpg)
 
+**Створення/додавання рецептів**
+![Створення рецептів](screenshots/create_recipes.jpg)
+
 **Інтерактивний календар планування**
-![Календар](screenshots/calendar.png)
+![Календар](screenshots/calendar.jpg)
 *(Зображення збережено у репозиторії в директорії `/screenshots/`)*
 
 ---
