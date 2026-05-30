@@ -8,7 +8,6 @@ load_dotenv()
 client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def generate_recipe_from_ai(prompt: str) -> dict:
-    # Додаємо жорсткі кулінарні правила в системний промпт
     system_prompt = """Ти професійний кулінарний помічник. 
     Згенеруй рецепт за запитом користувача.
     Ти ПОВИНЕН повернути відповідь виключно у форматі JSON з такими ключами:

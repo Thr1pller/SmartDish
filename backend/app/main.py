@@ -229,7 +229,7 @@ async def generate_and_save_recipe(request: AIPrompt, current_user: User = Depen
             time_cooking=ai_data.get("time_cooking", "30 хв"),
             ingredients=ai_data.get("ingredients", ""),
             quantity=ai_data.get("quantity", 1),
-            user_id=current_user.id  # <-- ПРИВ'ЯЗУЄМО ДО ЮЗЕРА
+            user_id=current_user.id
         )
         db.add(new_recipe)
         await db.commit()
@@ -238,7 +238,7 @@ async def generate_and_save_recipe(request: AIPrompt, current_user: User = Depen
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Помилка генерації: {str(e)}")
 
-# 2. Створення рецепта ВРУЧНУ 
+# 2. Створення рецепта вручну
 @app.post("/api/recipes", response_model=RecipeResponse)
 async def create_manual_recipe(recipe: RecipeCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     new_recipe = Recipe(**recipe.model_dump(), user_id=current_user.id)
@@ -247,14 +247,13 @@ async def create_manual_recipe(recipe: RecipeCreate, current_user: User = Depend
     await db.refresh(new_recipe)
     return new_recipe
 
-# 3. Отримання ТІЛЬКИ СВОЇХ рецептів
+# 3. Отримання тільки своїх рецептів
 @app.get("/api/recipes", response_model=list[RecipeResponse])
 async def get_all_recipes(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Recipe).where(Recipe.user_id == current_user.id))
     return result.scalars().all()
 
 # --- Логіка Планувальника (Календаря) ---
-
 # 1. Запланувати страву
 @app.post("/api/schedule", response_model=ScheduleResponse)
 async def create_schedule(schedule: ScheduleCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
@@ -269,7 +268,7 @@ async def create_schedule(schedule: ScheduleCreate, current_user: User = Depends
     await db.refresh(new_schedule)
     return new_schedule
 
-# 2. Отримати план на конкретну дату ТІЛЬКИ СВІЙ
+# 2. Отримати план на конкретну дату
 @app.get("/api/schedule/{target_date}", response_model=list[ScheduleResponse])
 async def get_schedule_by_date(target_date: date, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     try:
@@ -298,8 +297,7 @@ async def get_schedule_by_date(target_date: date, current_user: User = Depends(g
     return response_data
 
 # --- Логіка Пошуку та Видалення ---
-
-# 1. Пошук рецептів (ТІЛЬКИ СВОЇХ)
+# 1. Пошук рецептів
 @app.get("/api/recipes/search", response_model=list[RecipeResponse])
 async def search_recipes(keyword: str, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     query = select(Recipe).where(
@@ -312,7 +310,7 @@ async def search_recipes(keyword: str, current_user: User = Depends(get_current_
     result = await db.execute(query)
     return result.scalars().all()
 
-# 2. Видалення рецепта (перевірка чи він твій)
+# 2. Видалення рецепта
 @app.delete("/api/recipes/{recipe_id}")
 async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Recipe).where(Recipe.id == recipe_id, Recipe.user_id == current_user.id))
@@ -323,7 +321,7 @@ async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current
     await db.commit()
     return {"message": "Рецепт видалено"}
 
-# 3. Видалення запланованої страви з розкладу (перевірка чи розклад твій)
+# 3. Видалення запланованої страви з розкладу
 @app.delete("/api/schedule/{schedule_id}")
 async def delete_schedule(schedule_id: int, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == current_user.id))
@@ -353,33 +351,33 @@ class Verify2FASetup(BaseModel):
 
 @app.post("/api/users/me/2fa/enable")
 async def enable_2fa(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    # 1. Генеруємо ключ, АЛЕ НЕ ЗБЕРІГАЄМО ЙОГО В БАЗУ!
+    # Генеруємо ключ, не зберігаємо його в базу
     temp_secret = generate_2fa_secret()
     qr_code = generate_qr_code(current_user.email, temp_secret)
     
-    # 2. Просто віддаємо тимчасовий ключ фронтенду
+    # Віддаємо тимчасовий ключ фронтенду
     return {"secret": temp_secret, "qr_code": qr_code}
 
 @app.post("/api/users/me/2fa/verify")
 async def verify_2fa(data: Verify2FASetup, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    # 3. Перевіряємо, чи підходить код до цього тимчасового ключа
+    # Перевіряємо, чи підходить код до цього тимчасового ключа
     totp = pyotp.TOTP(data.secret)
     if totp.verify(data.code):
-        # 4. І ТІЛЬКИ ТЕПЕР зберігаємо ключ у базу назавжди!
+        # Зберігаємо ключ у базу назавжди
         current_user.two_factor_secret = data.secret
         await db.commit()
         return {"message": "2FA успішно активовано!"}
     else:
-        raise HTTPException(status_code=400, detail="Невірний код")
+        raise HTTPException(status_code=400, detail="Неправильний код")
 
 @app.get("/api/users/me/2fa/status")
 async def check_2fa_status(current_user: User = Depends(get_current_user)):
     secret = current_user.two_factor_secret
-    # Возвращает True только если это реальный длинный ключ
+    # Повертає True якщо це real key
     is_enabled = bool(secret and len(str(secret).strip()) > 10)
     return {"is_enabled": is_enabled}
 
-# 2. РЯТУВАЛЬНИЙ ЕНДПОІНТ (тільки для розробки)
+# 2. РЯТУВАЛЬНИЙ ЕНДПОІНТ
 @app.get("/api/dev/reset-2fa/{email}")
 async def reset_2fa_dev(email: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == email))
