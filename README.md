@@ -2,8 +2,14 @@
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009485?style=for-the-badge&logo=fastapi&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=for-the-badge)
+![Alembic](https://img.shields.io/badge/Alembic-5C5C5C?style=for-the-badge)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
 
 > Інтерактивний вебзастосунок для генерації, збереження та розумного планування кулінарних рецептів з використанням штучного інтелекту.
 
@@ -212,8 +218,8 @@ python -m pytest -v
 
 ## 🧾 Використані джерела / технологічний стек
 
-- Офіційна документація FastAPI (https://fastapi.tiangolo.com/)
-- Документація SQLAlchemy 2.0 (ORM)
-- API Documentation OpenAI
-- MDN Web Docs (JavaScript, HTML5, CSS3)
-- Pytest Documentation (Модульне тестування)
+- [Офіційна документація FastAPI](https://fastapi.tiangolo.com/)
+- [Документація SQLAlchemy 2.0 (ORM)](https://docs.sqlalchemy.org/)
+- [API Documentation OpenAI](https://platform.openai.com/docs/)
+- [MDN Web Docs (JavaScript, HTML5, CSS3)](https://developer.mozilla.org/)
+- [Pytest Documentation (Модульне тестування)](https://docs.pytest.org/)
