@@ -22,7 +22,7 @@ const TimeManager = {
         return localDate.toISOString(); // Перетворює в чистий UTC рядок: "2026-05-24T22:39:00.000Z"
     },
 
-    // 3. Бере UTC рядок з бази даних і витягує з нього красивий локальний час (HH:MM) для картки на екрані
+    // 3. Бере UTC рядок з бази даних і витягує з нього локальний час
     convertToLocalTime(isoStr) {
         if (!isoStr) return '';
         const date = new Date(isoStr);

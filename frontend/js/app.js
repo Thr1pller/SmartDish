@@ -1192,7 +1192,7 @@ addPlanBtn.addEventListener('click', async () => {
     // --- 3. КНОПКА "МОЇ РЕЦЕПТИ" ---
     const navRecipesWave = document.getElementById('navRecipesWave');
     const navRecipesText = document.getElementById('navRecipesText');
-    const authTooltip = document.getElementById('authTooltip'); // Додали змінну підказки
+    const authTooltip = document.getElementById('authTooltip'); // змінна підказки
 
     if (navRecipesBtn && navRecipesWave) {
         navRecipesBtn.addEventListener('mousemove', (e) => {
@@ -1207,10 +1207,10 @@ addPlanBtn.addEventListener('click', async () => {
             navRecipesWave.style.setProperty('--radius', '150%');
             if (navRecipesText) navRecipesText.style.color = '#fff'; 
             
-            // ПЕРЕВІРЯЄМО ЧИ ГІСТЬ
+            // перевіряємо чи гість
             const token = localStorage.getItem('access_token');
             if (!token && authTooltip) {
-                // Показуємо червону підказку, вона плавно виїжджає
+                // показуємо червону підказку
                 authTooltip.style.opacity = '1';
                 authTooltip.style.transform = 'translateX(-50%) translateY(0)';
             }
@@ -1220,7 +1220,7 @@ addPlanBtn.addEventListener('click', async () => {
             navRecipesWave.style.setProperty('--radius', '0%');
             if (navRecipesText) navRecipesText.style.color = ''; 
             
-            // ХОВАЄМО ПІДКАЗКУ
+            // ховаємо підказку
             if (authTooltip) {
                 authTooltip.style.opacity = '0';
                 authTooltip.style.transform = 'translateX(-50%) translateY(-5px)';

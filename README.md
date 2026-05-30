@@ -1,5 +1,10 @@
 # 📘 SmartDish (Кулінарний Асистент, FoodTech Web App)
 
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![FastAPI](https://img.shields.io/badge/FastAPI-009485?style=for-the-badge&logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+
 > Інтерактивний вебзастосунок для генерації, збереження та розумного планування кулінарних рецептів з використанням штучного інтелекту.
 
 ---
@@ -9,38 +14,40 @@
 - **ПІБ**: Константінов Микита Сергійович
 - **Група**: ФЕП-42
 - **Керівник**: Мисюк Роман, PhD, доцент
-- **Дата виконання**: [27.05.2026]
+- **Дата виконання**: 27.05.2026
 
 ---
 
 ## 📌 Загальна інформація
 
-- **Тип проєкту**: Веб-застосунок
+- **Тип проєкту**: Вебзастосунок (SPA)
 - **Мова програмування**: Python (Backend), JavaScript (Frontend)
-- **Фреймворки / Бібліотеки**: FastAPI, SQLAlchemy, Alembic, Pydantic, Passlib
+- **Фреймворки / Бібліотеки**: FastAPI, SQLAlchemy, Alembic, Pydantic, Passlib, PyOTP, Pytest
 - **База даних**: PostgreSQL
 
 ---
 
 ## 🧠 Опис функціоналу
 
-- 🔐 Реєстрація та авторизація користувачів (JWT, OAuth 2.0 Google, 2FA/TOTP)
-- 🗒️ Створення, редагування, перегляд та видалення рецептів
-- 🤖 Інтелектуальна генерація нових страв за текстовим запитом (OpenAI API)
-- 📅 Календар для планування розкладу прийомів їжі
-- 🌐 Асинхронний REST API для взаємодії між клієнтом та сервером
+- 🔐 Реєстрація та багаторівнева авторизація користувачів (JWT, OAuth 2.0 Google, 2FA/TOTP).
+- 🗒️ Створення, редагування, фільтрація за категоріями та видалення рецептів.
+- 🤖 Інтелектуальна генерація нових страв за текстовим запитом з автоматичною структуризацією у JSON (OpenAI API).
+- 📅 Інтерактивний календар для планування розкладу прийомів їжі.
+- ⏰ Фонова клієнтська система автоматичних нагадувань про заплановані страви.
+- 🌐 Асинхронний REST API для миттєвої взаємодії між клієнтом та сервером.
 
 ---
 
 ## 🧱 Опис основних класів / файлів
 
-| Клас / Файл     | Призначення |
+| Клас / Файл      | Призначення |
 |----------------|-------------|
-| `backend/main.py` | Точка входу FastAPI сервера та налаштування роутів |
-| `backend/app/services/ai_service.py` | Сервіс взаємодії з алгоритмами OpenAI API |
-| `backend/app/models/models.py` | ORM-моделі структури бази даних PostgreSQL |
-| `frontend/js/app.js` | Основна логіка клієнтської частини та HTTP-запити |
-| `frontend/js/timeManager.js` | Логіка обробки календаря та планувальника |
+| `backend/main.py` | Точка входу FastAPI сервера, налаштування роутів та бізнес-логіки API |
+| `backend/app/services/ai_service.py` | Асинхронний сервіс взаємодії з алгоритмами OpenAI API |
+| `backend/app/models/models.py` | ORM-моделі реляційної структури бази даних PostgreSQL |
+| `backend/tests/test_api.py` | Набір модульних тестів для перевірки безпеки та 2FA алгоритмів |
+| `frontend/js/app.js` | Основна логіка клієнтської частини та HTTP-запити (Fetch API) |
+| `frontend/js/timeManager.js` | Логіка обробки календаря, планувальника та системи нагадувань |
 
 ---
 
@@ -48,9 +55,9 @@
 
 ### 1. Встановлення інструментів
 
-- Python v3.12
-- СУБД PostgreSQL (запущена локально)
-- Розширення Live Server (у Visual Studio Code для фронтенду)
+- Python v3.12+
+- СУБД PostgreSQL (запущена локально або на VPS)
+- Розширення Live Server (у Visual Studio Code для запуску фронтенду)
 
 ### 2. Клонування репозиторію
 
@@ -64,30 +71,43 @@ cd recipe-web-app
 ```bash
 cd backend
 python -m venv venv
-source venv/Scripts/activate
+# Активація віртуального середовища (Windows)
+venv\Scripts\activate
+# Встановлення пакетів
 pip install -r requirements.txt
+# Застосування міграцій бази даних
 alembic upgrade head
 ```
 
 ### 4. Створення `.env` файлів
 
-Створіть файл `.env` у папці `backend/`:
+Створіть файл `.env` у корені папки `backend/`:
 
 ```env
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/recipes_db
 OPENAI_API_KEY=your_openai_api_key
 GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 JWT_SECRET=supersecretkey_for_tokens
 ```
 
-### 5. Запуск
+### 5. Запуск серверів
 
 ```bash
 # Backend (з папки backend)
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 
 # Frontend
-# Відкрийте папку frontend у VS Code та запустіть index.html за допомогою Live Server
+# Відкрийте папку frontend у VS Code та запустіть index.html за допомогою Live Server (Порт 5500)
+```
+
+### 6. Запуск модульних тестів
+
+Для перевірки працездатності алгоритмів захисту та авторизації виконайте команду:
+
+```bash
+cd backend
+python -m pytest -v
 ```
 
 ---
@@ -105,11 +125,11 @@ uvicorn app.main:app --reload
 }
 ```
 
-**Response:**
+**Response (Успіх):**
 
 ```json
 {
-  "access_token": "jwt_token_here",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5c...",
   "token_type": "bearer"
 }
 ```
@@ -119,7 +139,7 @@ uvicorn app.main:app --reload
 ### 📋 ШІ-Генерація рецепта
 
 **POST /api/ai/generate**
-*(Потребує Authorization: Bearer token)*
+*(Потребує Header: Authorization: Bearer <token>)*
 
 ```json
 {
@@ -131,10 +151,13 @@ uvicorn app.main:app --reload
 
 ```json
 {
-  "title": "Авокадо-тост з яйцем пашот",
-  "category": "Сніданок",
-  "prep_time": "15 хвилин",
-  "ingredients": ["Яйце - 2 шт.", "Авокадо - 1 шт.", "Хліб - 2 скибочки"]
+  "name": "Авокадо-тост з яйцем пашот",
+  "category": "second_dishes",
+  "time_cooking": "15 хв",
+  "ingredients": "Яйце - 2 шт.\nАвокадо - 1 шт.\nХліб - 2 скибочки",
+  "quantity": 1,
+  "id": 15,
+  "user_id": 2
 }
 ```
 
@@ -143,14 +166,14 @@ uvicorn app.main:app --reload
 ## 🖱️ Інструкція для користувача
 
 1. **Головна сторінка**:
-   - `Увійти / Зареєструватись` — класична авторизація або вхід через Google акаунт.
+   - `Увійти / Зареєструватись` — класична авторизація або швидкий вхід через обліковий запис Google.
 2. **Після авторизації**:
-   - Панель рецептів дозволяє переглядати власні страви або генерувати нові за допомогою ШІ.
-   - Кнопка додавання у розклад дозволяє прив'язати рецепт до конкретної дати у календарі.
+   - Панель рецептів дозволяє переглядати власні страви, додавати їх вручну або генерувати нові за допомогою ШІ.
+   - Кнопка додавання у розклад дозволяє прив'язати рецепт до конкретної дати у календарі (Сніданок, Обід, Вечеря).
 3. **Налаштування безпеки**:
-   - У профілі доступна прив'язка акаунта до мобільного автентифікатора (2FA) за QR-кодом.
+   - У профілі доступна прив'язка акаунта до мобільного автентифікатора (наприклад, Google Authenticator) для активації 2FA за допомогою QR-коду.
 4. **Вихід**:
-   - Кнопка `Вийти` безпечно очищує локальні дані та завершує сесію.
+   - Кнопка `Вийти` безпечно очищує локальні дані (JWT-токени) та завершує сесію.
 
 ---
 
@@ -159,7 +182,7 @@ uvicorn app.main:app --reload
 **Головний екран авторизації**
 ![Екран входу](screenshots/login.jpg)
 
-**Налаштування користувача**
+**Налаштування користувача (2FA)**
 ![Налаштування](screenshots/settings.jpg)
 
 **Панель згенерованих рецептів**
@@ -171,24 +194,26 @@ uvicorn app.main:app --reload
 
 **Інтерактивний календар планування**
 ![Календар](screenshots/calendar.jpg)
+
 *(Зображення збережено у репозиторії в директорії `/screenshots/`)*
 
 ---
 
-## 🧪 Проблеми і рішення
+## 🧪 Вирішення типових проблем
 
-| Проблема              | Рішення                            |
+| Проблема              | Рішення                                    |
 |----------------------|------------------------------------|
-| CORS помилка         | Переконатися, що фронтенд запущено через Live Server, а у `main.py` налаштовано `CORSMiddleware` |
-| Помилка підключення БД| Перевірити правильність логіна/пароля у змінній `DATABASE_URL` файлу `.env` |
-| 401 Unauthorized     | Перевірити наявність та термін дії JWT-токена у заголовку запиту |
-| OpenAI API Error     | Переконатися у правильності ключа `OPENAI_API_KEY` та наявності балансу на акаунті |
+| **CORS помилка** | Переконатися, що фронтенд запущено через Live Server, а у `main.py` налаштовано `CORSMiddleware` |
+| **Помилка підключення БД**| Перевірити правильність логіна/пароля у змінній `DATABASE_URL` файлу `.env` |
+| **401 Unauthorized** | Перевірити наявність та термін дії JWT-токена у заголовку запиту, або правильність введення 2FA коду |
+| **OpenAI API Error** | Переконатися у правильності ключа `OPENAI_API_KEY` та наявності коштів на балансі платформи |
 
 ---
 
-## 🧾 Використані джерела / література
+## 🧾 Використані джерела / технологічний стек
 
 - Офіційна документація FastAPI (https://fastapi.tiangolo.com/)
-- Документація SQLAlchemy 2.0
-- Документація OpenAI API
-- MDN Web Docs (JavaScript, HTML, CSS)
+- Документація SQLAlchemy 2.0 (ORM)
+- API Documentation OpenAI
+- MDN Web Docs (JavaScript, HTML5, CSS3)
+- Pytest Documentation (Модульне тестування)
