@@ -24,7 +24,7 @@ async def generate_recipe_from_ai(prompt: str) -> dict:
     4. "drinks" — гарячі та холодні напої."""
 
     response = await client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}

@@ -101,7 +101,7 @@ JWT_SECRET=supersecretkey_for_tokens
 
 ```bash
 # Backend (з папки backend)
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 
 # Frontend
 # Відкрийте папку frontend у VS Code та запустіть index.html за допомогою Live Server (Порт 5500)

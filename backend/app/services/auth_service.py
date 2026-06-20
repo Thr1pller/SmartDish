@@ -1,7 +1,4 @@
-import pyotp
-import qrcode
-import io
-import base64
+import pyotp, qrcode, io, base64
 
 def generate_2fa_secret():
     return pyotp.random_base32()
